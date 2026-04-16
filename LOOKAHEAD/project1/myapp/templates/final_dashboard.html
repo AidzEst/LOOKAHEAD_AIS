@@ -1,0 +1,102 @@
+{% extends "header.html" %} 
+
+{% block content %}
+<div id="dashboard-sec" class="section active">
+    <div class="header-flex">
+        <h1>Dashboard</h1>
+    </div>
+
+    <div class="dashboard-cards">
+        <div class="card" style="padding: 20px;">
+            <h3>Total Revenue</h3>
+            <h2 id="totalRevenue">₱{{ netrevenue }}</h2>
+            <p>Updated from sales</p>
+        </div>
+
+        <div class="card" style="padding: 20px;">
+            <h3>Total Sales Orders</h3>
+            <h2 id="salesCount">{{ totalsales }}</h2>
+        </div>
+
+        <div class="card" style="padding: 20px;">
+            <h3>Total Purchase Orders</h3>
+            <h2 id="purchaseCount">{{ totalpurchases }}</h2>
+        </div>    
+    </div>
+        <div class="card" style="margin-top: 20px;">
+    <div style="padding: 20px; border-bottom: 1px solid #e2e8f0;">
+        <h3>Recent Sales</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Receipt ID</th>
+                <th>Product ID</th>
+                <th>Price</th>
+                <th>Sales Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody id="recentPurchaseTable">
+            {% for po in sales %}
+            <tr>
+                <td>{{ po.receipt_id }}</td>
+                <td>{{ po.product_id }}</td>
+                <td>{{ po.sales_price }}</td>
+                <td>{{ po.sales_quantity }}</td>
+                <td>{{ po.sales_amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="card" style="margin-top: 20px;">
+<div style="padding: 20px; border-bottom: 1px solid #e2e8f0;">
+    <h3>Recent Purchase</h3>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>Purchase ID</th>
+            <th>Item Name</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+        <tbody id="recentSalesTable">
+            {% for po in purchases %}
+            <tr>
+                <td>{{ po.purchase_id }}</td>
+                <td>{{ po.purchase_item_name }}</td>
+                <td>{{ po.purchase_quantity }}</td>
+                <td>{{ po.purchase_cost }}</td>
+                <td>{{ po.purchase_total_cost}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+</table>
+</div>
+</div>
+<div id="inventory-sec" class="section">
+    <div class="header-flex">
+        <h1>Inventory</h1>
+        <button class="btn-add" onclick="openModal('invModal')">Add Product</button>
+    </div>
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Category ID</th>
+                    <th>Purchase Price</th>
+                    <th>Arrival Date</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable"></tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

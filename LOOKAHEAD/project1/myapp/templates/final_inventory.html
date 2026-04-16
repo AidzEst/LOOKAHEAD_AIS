@@ -1,0 +1,176 @@
+{% extends "header.html" %}
+
+{% block content %}
+<div class="header-flex">
+    <h1>Inventory</h1>
+</div>
+
+<div class="card">
+    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
+        <input type="text" id="inventorySearch" placeholder="Search by name, category, ID…"
+            style="width: 100%; max-width: 360px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.875rem; outline: none;"
+            oninput="filterInventory(this.value)">
+    </div>
+    <table id="inventory-table">
+        <thead>
+            <tr>
+                <th>Product ID</th><th>Product Name</th><th>Quantity</th>
+                <th>Category</th><th>Price</th><th>Arrival Date</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTable">
+        {% for product in products %}
+            <tr style="cursor:pointer;" onclick="openModal({{ product.product_id }}, '{{ product.product_name }}')">
+                <td>{{ product.product_id }}</td>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.category.category_name }}</td>
+                <td>{{ product.purchase_price }}</td>
+                <td>{{ product.shipment_date }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center; color: var(--slate); padding: 30px;">
+                    No products in inventory yet.
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p id="noResults" style="display:none; text-align:center; color: var(--slate); padding: 30px; font-size: 0.875rem;">
+        No products match your search.
+    </p>
+</div>
+
+<!-- History Modal -->
+<div id="historyOverlay" onclick="if(event.target===this)closeModal()"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:10px; width:90%; max-width:660px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border);">
+            <h3 id="modalTitle" style="margin:0; font-size:1rem; font-weight:600;"></h3>
+            <button onclick="closeModal()" style="background:none; border:none; font-size:1.25rem; cursor:pointer; color:#888; line-height:1;">✕</button>
+        </div>
+        <div style="display:flex; border-bottom:1px solid var(--border);">
+            <button id="tabPurchase" onclick="switchTab('purchase')"
+                style="padding:10px 18px; font-size:0.875rem; border:none; border-bottom:2px solid #000; cursor:pointer; background:none; font-weight:600;">
+                Purchases
+            </button>
+            <button id="tabSales" onclick="switchTab('sales')"
+                style="padding:10px 18px; font-size:0.875rem; border:none; border-bottom:2px solid transparent; cursor:pointer; background:none; color:#888;">
+                Sales
+            </button>
+        </div>
+        <div style="max-height:360px; overflow-y:auto;">
+            <div id="purchasePane">
+                <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Purchase ID</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Qty</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Unit Cost</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Total Cost</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Shipment Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseBody"></tbody>
+                </table>
+                <p id="purchaseEmpty" style="display:none; text-align:center; padding:28px; color:#888; font-size:0.875rem;">No purchase records found.</p>
+            </div>
+            <div id="salesPane" style="display:none;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Sale ID</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Date</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Qty</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Price</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Discount</th>
+                            <th style="text-align:left; padding:8px 14px; color:#888; font-weight:500; border-bottom:1px solid var(--border);">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesBody"></tbody>
+                </table>
+                <p id="salesEmpty" style="display:none; text-align:center; padding:28px; color:#888; font-size:0.875rem;">No sales records found.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterInventory(query) {
+    const filter = query.toLowerCase();
+    const rows = document.querySelectorAll('#inventoryTable tr');
+    let visibleCount = 0;
+    rows.forEach(row => {
+        const match = Array.from(row.getElementsByTagName('td')).some(cell =>
+            cell.textContent.toLowerCase().includes(filter)
+        );
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+    });
+    const noResults = document.getElementById('noResults');
+    if (noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function openModal(productId, productName) {
+    const overlay = document.getElementById('historyOverlay');
+    if (!overlay) return;
+
+    document.getElementById('modalTitle').textContent = productName + ' — History';
+    document.getElementById('purchaseBody').innerHTML = '';
+    document.getElementById('salesBody').innerHTML = '';
+    document.getElementById('purchaseEmpty').style.display = 'none';
+    document.getElementById('salesEmpty').style.display = 'none';
+    switchTab('purchase');
+    overlay.style.display = 'flex';
+
+    fetch(`/inventory/history/${productId}/`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.purchases.length) {
+                document.getElementById('purchaseBody').innerHTML = data.purchases.map(p => `
+                    <tr style="border-bottom:1px solid var(--border);">
+                        <td style="padding:9px 14px;">${p.purchase_id}</td>
+                        <td style="padding:9px 14px;">${p.purchase_quantity}</td>
+                        <td style="padding:9px 14px;">${parseFloat(p.purchase_cost).toLocaleString()}</td>
+                        <td style="padding:9px 14px;">${parseFloat(p.purchase_total_cost).toLocaleString()}</td>
+                        <td style="padding:9px 14px;">${p.purchase_shipment_date || '—'}</td>
+                    </tr>`).join('');
+            } else {
+                document.getElementById('purchaseEmpty').style.display = 'block';
+            }
+
+            if (data.sales.length) {
+                document.getElementById('salesBody').innerHTML = data.sales.map(s => `
+                    <tr style="border-bottom:1px solid var(--border);">
+                        <td style="padding:9px 14px;">${s.sales_id}</td>
+                        <td style="padding:9px 14px;">${s.date}</td>
+                        <td style="padding:9px 14px;">${s.sales_quantity}</td>
+                        <td style="padding:9px 14px;">${parseFloat(s.sales_price).toLocaleString()}</td>
+                        <td style="padding:9px 14px;">${parseFloat(s.sales_discount).toLocaleString()}</td>
+                        <td style="padding:9px 14px;">${parseFloat(s.sales_amount).toLocaleString()}</td>
+                    </tr>`).join('');
+            } else {
+                document.getElementById('salesEmpty').style.display = 'block';
+            }
+        })
+        .catch(err => console.error('Failed to load history:', err));
+}
+
+function closeModal() {
+    const overlay = document.getElementById('historyOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function switchTab(tab) {
+    document.getElementById('purchasePane').style.display = tab === 'purchase' ? '' : 'none';
+    document.getElementById('salesPane').style.display = tab === 'sales' ? '' : 'none';
+    document.getElementById('tabPurchase').style.borderBottomColor = tab === 'purchase' ? '#000' : 'transparent';
+    document.getElementById('tabPurchase').style.color = tab === 'purchase' ? '' : '#888';
+    document.getElementById('tabPurchase').style.fontWeight = tab === 'purchase' ? '600' : 'normal';
+    document.getElementById('tabSales').style.borderBottomColor = tab === 'sales' ? '#000' : 'transparent';
+    document.getElementById('tabSales').style.color = tab === 'sales' ? '' : '#888';
+    document.getElementById('tabSales').style.fontWeight = tab === 'sales' ? '600' : 'normal';
+}
+</script>
+{% endblock %}

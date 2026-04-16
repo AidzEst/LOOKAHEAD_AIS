@@ -1,0 +1,50 @@
+{% extends "header.html" %} 
+{% block content %}
+
+<div>
+<div><h1>Sales Journal</h1>
+</div>
+<div class="card">
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Sales ID</th>
+                <th>Receipt ID</th>
+                <th>Product</th>
+                <th>Employee</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for s in sales %}
+    <tr>
+        <td>{{ s.sales_id }}</td>
+        <td>{{ s.receipt_id }}</td>
+        <td>
+            {% for p in product %}
+                {% if p.product_id == s.product_id %}
+                    {{ p.product_name }}
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>
+            {% for emp in employee %}
+                {% if emp.empid == s.employee_id %}
+                    {{emp.name}}
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ s.sales_quantity }}</td>
+        <td>{{ s.sales_price }}</td>
+        <td>{{ s.sales_amount }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+    </table>
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "header.html" %} 
+{% load static %}
+
+{% block content %}
+
+<div class="modal_overlay" id="empModal">
+    <div class="modal">
+        <h2>Add Employee</h2>
+        <form method="POST" id="empForm">
+    {% csrf_token %}
+    <div class="grid-form">
+
+        <div class="form-group">
+            <label>Employee ID</label>
+            <input name="empid" type="text" id="e_id" value="{{ new_id }}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Employee Name</label>
+            <input name="inputname" type="text" id="e_name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Position</label>
+            <input name="position" type="text" id="e_pos">
+        </div>
+
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input name="contactnumber" type="number" id="e_con">
+        </div>
+
+        <div class="form-group">
+            <label>Sex</label>
+            <input name="sex" type="text" id="e_sex">
+        </div>
+
+        <div class="form-group">
+            <label>Date of Birth</label>
+            <input name="dob" type="date" id="e_dob">
+        </div>
+
+        <div class="form-group">
+            <label>Date Hired</label>
+            <input name="dh" type="date" id="e_hired">
+        </div>
+
+        <div class="form-group">
+            <label>Salary Amount</label>
+            <input name="sa" type="number" step="0.01" id="e_sal">
+        </div>
+
+        <div class="form-group full">
+            <label>Address</label>
+            <input name="address" type="text" id="e_addr">
+        </div>
+
+        <div class="form-group full">
+            <label>Password</label>
+            <input name="password" type="text" id="e_pass">
+        </div>
+
+    </div>
+
+    <div class="modal_footer">
+        <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
+        <button type="submit" class="btn-add">Save</button>
+    </div>
+</form>
+    </div>
+</div>
+
+<!-- EMPLOYEES SECTION -->
+<div id="employees-sec" class="section active">
+    <div class="header-flex">
+        <h1>Employees</h1>
+        <button class="btn-add" onclick="openModal('empModal')">+ Add Employee</button>
+    </div>
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Contact</th>
+                    <th>Sex</th>
+                    <th>DOB</th>
+                    <th>Hired</th>
+                    <th>Salary</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody id="empTable">
+                {% for emp in employeeinfo %}
+                <tr>
+                    <td>{{ emp.empid }}</td>
+                    <td>{{ emp.name }}</td>
+                    <td>{{ emp.position }}</td>
+                    <td>{{ emp.contact }}</td>
+                    <td>{{ emp.sex }}</td>
+                    <td>{{ emp.dob }}</td>
+                    <td>{{ emp.hired_date }}</td>
+                    <td>{{ emp.salary }}</td>
+                    <td>
+                        <span id="pwd-{{ emp.empid }}">••••••••</span>
+                            <button class="toggle-btn"onclick="togglePassword('{{ emp.empid }}', '{{ emp.password }}')">Show</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align:center; color: var(--slate); padding: 30px;">
+                        No employees yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+</style>
+
+<script>
+    function toggleForm() {
+        const form = document.getElementById('catFormCard');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+    function togglePassword(id, realPassword) {
+    const el = document.getElementById('pwd-' + id);
+
+    if (el.innerText === '••••••••') {
+        el.innerText = realPassword;
+    } else {
+        el.innerText = '••••••••';
+    }
+    }
+</script>
+
+{% endblock %}

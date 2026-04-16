@@ -1,0 +1,51 @@
+{% extends "header.html" %} 
+
+{% block content %}
+
+<div>
+<div><h1>Restock Journal</h1>
+</div>
+<div class="card">
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Restock ID</th>
+                <th>Product</th>
+                <th>Unit Cost</th>
+                <th>Quantity</th>
+                <th>Total Cost</th>
+                <th>Employee</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for rs in restock %}
+    <tr>
+        <td>{{ rs.restock_id }}</td>
+        <td>
+            {% for p in product %}
+                {% if p.product_id == rs.product_id %}
+                    {{ p.product_name }}
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ rs.unit_cost }}</td>
+        <td>{{ rs.restock_quantity }}</td>
+        <td>{{ rs.total_cost }}</td>
+        <td>
+            {% for emp in employee %}
+                {% if emp.empid == rs.employee_id %}
+                    {{emp.name}}
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ rs.restock_date }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+    </table>
+</div>
+</div>
+
+{% endblock %}

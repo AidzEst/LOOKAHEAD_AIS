@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOOKAHEAD | Predictive Retail Systems</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --success: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: white;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 8%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn-login {
+            background: var(--primary);
+            color: white !important;
+            padding: 0.7rem 1.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 8% 8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: radial-gradient(circle at top right, #eff6ff 0%, #ffffff 50%);
+            gap: 4rem;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-text h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-weight: 800;
+        }
+
+        .hero-text h1 span {
+            color: var(--primary);
+        }
+
+        .hero-text p {
+            font-size: 1.15rem;
+            color: var(--secondary);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+        }
+
+        .main-cta {
+            padding: 1.1rem 2.2rem;
+            font-size: 1.1rem;
+            background: var(--dark);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-block;
+        }
+
+        .main-cta:hover {
+            transform: translateY(-3px);
+            background: #000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* CSS DASHBOARD MOCKUP (No Image Needed) */
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        .mock-window {
+            width: 100%;
+            max-width: 550px;
+            height: 380px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 40px 80px rgba(15, 23, 42, 0.15);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            transform: rotateY(-15deg) rotateX(5deg);
+            transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .mock-window:hover {
+            transform: rotateY(0deg) rotateX(0deg) scale(1.02);
+        }
+
+        .window-header {
+            background: #f8fafc;
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-1 { background: #ff5f56; }
+        .dot-2 { background: #ffbd2e; }
+        .dot-3 { background: #27c93f; }
+
+        .window-content { padding: 25px; }
+
+        .mock-nav {
+            height: 25px; width: 100%;
+            background: #f1f5f9;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            display: flex; align-items: center; padding-left: 10px;
+        }
+        .mock-nav::after { content: ''; width: 40%; height: 8px; background: #cbd5e1; border-radius: 4px; }
+
+        .mock-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+
+        .mock-sidebar { display: flex; flex-direction: column; gap: 12px; }
+        .mock-item { height: 12px; background: #f1f5f9; border-radius: 4px; }
+        
+        .mock-chart-container {
+            height: 160px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-end;
+            padding: 15px;
+            gap: 10px;
+        }
+
+        .mock-bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 4px 4px 2px 2px;
+            animation: grow 1.5s ease-out forwards;
+            transform-origin: bottom;
+        }
+
+        @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 8%;
+            background: #fff;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 { font-size: 2.2rem; margin-bottom: 1rem; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            background: #fff;
+            border: 1px solid #f1f5f9;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border-color: var(--primary);
+        }
+
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            background: #eff6ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        footer {
+            background: var(--dark);
+            color: #94a3b8;
+            padding: 4rem 8%;
+            text-align: center;
+            border-top: 1px solid #1e293b;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero { flex-direction: column; text-align: center; padding-top: 4rem; }
+            .hero-text { max-width: 100%; }
+            .hero-text h1 { font-size: 3rem; }
+            .hero-text p { margin: 0 auto 2.5rem; }
+            .hero-visual { perspective: none; }
+            .mock-window { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo">
+            <i class="fas fa-layer-group"></i> LOOKAHEAD
+        </a>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#features">Solutions</a></li>
+            <li><a href= {% url 'loginpage' %} class="btn-login">System Login</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-text">
+            <h1>Predict the <span>Growth</span> of your Store.</h1>
+            <p>The ultimate Retail Information System. Manage your POS, track detailed accounting, and use AI to forecast your sales trends in one unified platform.</p>
+            <a href= {% url 'loginpage' %} class="main-cta">Get Started Now <i class="fas fa-chevron-right" style="margin-left: 10px; font-size: 0.9rem;"></i></a>
+        </div>
+
+        <div class="hero-visual">
+            <!-- CSS-ONLY MOCKUP WINDOW -->
+            <div class="mock-window">
+                <div class="window-header">
+                    <div class="dot dot-1"></div>
+                    <div class="dot dot-2"></div>
+                    <div class="dot dot-3"></div>
+                </div>
+                <div class="window-content">
+                    <div class="mock-nav"></div>
+                    <div class="mock-grid">
+                        <div class="mock-sidebar">
+                            <div class="mock-item" style="width: 90%; background: #e2e8f0;"></div>
+                            <div class="mock-item" style="width: 70%;"></div>
+                            <div class="mock-item" style="width: 80%;"></div>
+                            <div class="mock-item" style="width: 60%;"></div>
+                            <div class="mock-item" style="width: 85%;"></div>
+                        </div>
+                        <div class="mock-chart-container">
+                            <div class="mock-bar" style="height: 40%; opacity: 0.4;"></div>
+                            <div class="mock-bar" style="height: 60%; opacity: 0.6;"></div>
+                            <div class="mock-bar" style="height: 85%;"></div>
+                            <div class="mock-bar" style="height: 50%; opacity: 0.5;"></div>
+                            <div class="mock-bar" style="height: 95%; background: var(--success);"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 25px; display: flex; gap: 15px;">
+                        <div style="flex:1; height: 45px; background: #f1f5f9; border-radius: 8px;"></div>
+                        <div style="flex:1; height: 45px; background: #f1f5f9; border-radius: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="features" id="features">
+        <div class="section-title">
+            <h2>Built for Modern Retailers</h2>
+            <p>Everything you need to run a data-driven business.</p>
+        </div>
+
+        <div class="grid">
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-chart-line"></i></div>
+                <h3>Sales Forecasting</h3>
+                <p>Use predictive analytics to see which products will sell most next month and optimize your inventory.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-calculator"></i></div>
+                <h3>Automated Accounting</h3>
+                <p>Every transaction from the POS is automatically recorded in your ledgers for instant financial health checks.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-tablet-screen-button"></i></div>
+                <h3>Unified POS</h3>
+                <p>A fast, responsive Point of Sale system that works on tablets or desktops with offline capabilities.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 LOOKAHEAD Predictive Analytic Systems. All rights reserved.</p>
+        <div style="margin-top: 15px; font-size: 0.85rem;">
+            Retail Management • Predictive Analytics • Smart Accounting
+        </div>
+    </footer>
+
+</body>
+</html>

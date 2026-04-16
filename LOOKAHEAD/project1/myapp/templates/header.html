@@ -1,0 +1,66 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<nav>
+    <a href="{% url 'homepage' %}" class="nav-logo {% if request.resolver_match.url_name == 'homepage' %}active{% endif %}">LOOKAHEAD</a>
+
+    <div class="nav-section-title">Overview</div>
+    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+    <a href="{% url 'sales_report' %}" class="nav-item {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">Sales Report</a>
+    
+    <div class="nav-section-title">POS/Retail</div>
+    <a href="{% url 'inventory' %}" class="nav-item {% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">Inventory</a>
+    <a href="{% url 'categories' %}" class="nav-item {% if request.resolver_match.url_name == 'categories' %}active{% endif %}">Categories</a>
+    <a href="{% url 'salesorder' %}" class="nav-item {% if request.resolver_match.url_name == 'salesorder' %}active{% endif %}">Sales Order</a>
+    <a href="{% url 'purchaseorder' %}" class="nav-item {% if request.resolver_match.url_name == 'purchaseorder' %}active{% endif %}">Purchase Order</a>
+
+    {% if user.position == "Manager" %}
+    <a href="{% url 'employees' %}" class="nav-item {% if request.resolver_match.url_name == 'employees' %}active{% endif %}">Employees</a>
+    <a href="{% url 'membership' %}" class="nav-item {% if request.resolver_match.url_name == 'membership' %}active{% endif %}">Membership</a>
+    <a href="{% url 'restock' %}" class="nav-item {% if request.resolver_match.url_name == 'restock' %}active{% endif %}">Restock Order</a>
+    {% endif %}
+
+    {% if user.position == "Manager" %}
+    <div class="nav-section-title">Accounting</div>
+
+    <a href="{% url 'receipts' %}" class="nav-item {% if request.resolver_match.url_name == 'receipts' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> Receipts
+    </a>
+    <a href="{% url 'salesjournal' %}" class="nav-item {% if request.resolver_match.url_name == 'salesjournal' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> Sales Journal
+    </a>
+    <a href="{% url 'purchasejournal' %}" class="nav-item {% if request.resolver_match.url_name == 'purchasejournal' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> Purchase Journal
+    </a>
+    <a href="{% url 'restockjournal' %}" class="nav-item {% if request.resolver_match.url_name == 'restockjournal' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> Restock Journal
+    </a>
+    <a href="{% url 'expenses' %}" class="nav-item {% if request.resolver_match.url_name == 'expenses' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> Expenses
+    </a>
+    <a href="{% url 'trialbalance' %}" class="nav-item {% if request.resolver_match.url_name == 'trialbalance' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> Trial Balance
+    </a>
+    <a href="{% url 'pnlstatement' %}" class="nav-item {% if request.resolver_match.url_name == 'pnlstatement' %}active{% endif %}">
+        <i class="fas fa-file-invoice"></i> P&L Statement
+    </a>
+    {% endif %}
+</nav>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{% static 'script.js' %}"></script>
+</body>
+</html>

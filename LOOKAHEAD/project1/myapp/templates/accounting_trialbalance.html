@@ -1,0 +1,90 @@
+{% extends "header.html" %} 
+{% load static %}
+{% block content %}
+
+<section id="trialbalance-sec" class="section active">
+    <div class="header-flex">
+        <h1>Trial Balance</h1>
+    </div>
+
+    <div class="card">
+        <table>
+            <caption style="padding:10px; font-weight:600;">Trial Balance Report</caption>
+            <thead>
+                <tr>
+                    <th>Account Title</th>
+                    <th>Debit (₱)</th>
+                    <th>Credit (₱)</th>
+                </tr>
+            </thead>
+            <tbody id="trialBalanceTable">
+                <!-- JS will populate -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="balanceStatus" class="status"></div>
+</section>
+
+<script>
+    const salesSum = {{ totalsales|default:0 }};
+    const purchaseSum = {{ totalpurchases|default:0 }};
+    const expenseSum = {{ totalexpenses|default:0 }};
+    const inventory = {{ inventory|default:0}};
+    const restock = {{ restock|default:0}}
+    const Cashcred = purchaseSum + expenseSum  + restock;
+    const COGS = purchaseSum - inventory;
+    const FinalInventory = inventory + restock;
+    const Cash = salesSum;
+    const trialData = [
+        { account: "Cash", debit: Cash, credit: Cashcred },
+        { account: "Cost of Goods Sold", debit: COGS, credit: 0 },
+        { account: "Expenses", debit: expenseSum, credit: 0 },
+        {account: "Inventory", debit: FinalInventory, credit: 0},
+        { account: "Revenue", debit: 0, credit: salesSum }
+    ];
+
+function renderTrialBalance() {
+    const table = document.getElementById("trialBalanceTable");
+    const status = document.getElementById("balanceStatus");
+
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    table.innerHTML = "";
+
+    trialData.forEach(item => {
+        totalDebit += item.debit;
+        totalCredit += item.credit;
+
+        table.innerHTML += `
+            <tr>
+                <td>${item.account}</td>
+                <td>${item.debit ? "₱" + item.debit.toLocaleString() : ""}</td>
+                <td>${item.credit ? "₱" + item.credit.toLocaleString() : ""}</td>
+            </tr>
+        `;
+    });
+
+    table.innerHTML += `
+        <tr class="total-row">
+            <td>Total</td>
+            <td>₱${totalDebit.toLocaleString()}</td>
+            <td>₱${totalCredit.toLocaleString()}</td>
+        </tr>
+    `;
+
+    // Balance check
+    if (totalDebit === totalCredit) {
+        status.innerHTML = "✔ Balanced";
+        status.className = "status balanced";
+    } else {
+        status.innerHTML = "✘ Not Balanced";
+        status.className = "status unbalanced";
+    }
+}
+
+renderTrialBalance();
+</script>
+
+{% endblock %}

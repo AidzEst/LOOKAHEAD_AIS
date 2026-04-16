@@ -1,0 +1,808 @@
+:root {
+    --sidebar-bg: #0f172a;
+    --primary: #1417c8;
+    --bg-light: #f8fafc;
+    --text-main: #1e293b;
+    --border: #e2e8f0;
+    --danger: #ef4444;
+    --slate: #475569;
+    --success: #16a34a;
+    --surface: #f8fafc;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Body ── */
+body {
+    background-color: var(--bg-light);
+    display: flex;
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* ============================================================
+   SIDEBAR / NAV
+   ============================================================ */
+nav {
+    width: 260px;
+    background: var(--sidebar-bg);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    padding: 25px 0;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.nav-logo {
+    padding: 0 25px 30px;
+    border-bottom: 1px solid #1e293b;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #818cf8;
+    text-decoration: none;
+}
+
+/* "Accounting" section label */
+.nav-section-title {
+    padding: 14px 25px 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    letter-spacing: 0.08em;
+}
+
+.nav-item {
+    padding: 14px 25px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none; /* for <a> nav items */
+}
+
+.nav-item i {
+    width: 25px;
+}
+
+.nav-item:hover {
+    background: #1e293b;
+    color: white;
+}
+
+.nav-item.active {
+    background: var(--primary);
+    color: white;
+    border-radius: 0 30px 30px 0;
+    margin-right: 15px;
+}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+main {
+    margin-left: 260px;
+    flex: 1;
+    width: calc(100% - 260px);
+    padding: 40px;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-add {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-cancel {
+    background: var(--slate);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-remove {
+    background: #fee2e2;
+    color: var(--danger);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-remove:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* ============================================================
+   CARD + TABLE
+   ============================================================ */
+.card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th {
+    background: #f8fafc;
+    padding: 12px 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+/* ============================================================
+   MODAL (modal_overlay — used by employees, membership, etc.)
+   ============================================================ */
+.modal_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal_overlay.active {
+    display: flex;
+}
+
+/* modal-overlay — used by purchase order, dashboard */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    width: 600px;
+    border-radius: 12px;
+    padding: 25px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.modal-wide {
+    max-width: 760px;
+    width: 95vw;
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+.grid-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.full {
+    grid-column: span 2;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+input,
+select {
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--primary);
+}
+
+.modal_footer,
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ============================================================
+   ANIMATION
+   ============================================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================================
+   DASHBOARD — stat cards grid
+   ============================================================ */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+
+/* ============================================================
+   PRODUCT PICKER (Sales Order / Restock Order)
+   ============================================================ */
+.product-picker-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.product-picker-overlay.active {
+    display: flex;
+}
+
+.product-picker {
+    background: white;
+    border-radius: 12px;
+    width: 700px;
+    max-width: 95vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.picker-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.picker-header h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.picker-search {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+}
+
+.picker-search:focus {
+    border-color: var(--primary);
+}
+
+.picker-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--slate);
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.picker-close:hover {
+    background: #f1f5f9;
+    color: var(--text-main);
+}
+
+.picker-body {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.picker-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: unset;
+}
+
+.picker-table thead tr {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.picker-table th {
+    background: #f8fafc;
+    padding: 10px 16px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    min-width: unset;
+}
+
+.picker-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-main);
+    min-width: unset;
+}
+
+.picker-table tbody tr {
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.picker-table tbody tr:hover {
+    background: #eff6ff;
+}
+
+.picker-table tbody tr:active {
+    background: #dbeafe;
+}
+
+.picker-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--slate);
+    font-size: 0.85rem;
+}
+
+/* ── Stock badges ── */
+.badge-stock {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-in  { background: #dcfce7; color: #15803d; }
+.badge-low { background: #fef9c3; color: #854d0e; }
+.badge-out { background: #fee2e2; color: #b91c1c; }
+
+/* ── Product trigger field ── */
+.product-input-wrap {
+    position: relative;
+}
+
+.product-input-wrap input[readonly] {
+    cursor: pointer;
+    padding-right: 32px;
+}
+
+.product-input-wrap input[readonly]:hover {
+    border-color: var(--primary);
+}
+
+.picker-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+    font-size: 14px;
+}
+
+/* ── Selected strip ── */
+.selected-strip {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #1d4ed8;
+}
+
+.selected-strip.show {
+    display: flex;
+}
+
+.selected-strip strong {
+    color: #1e3a8a;
+}
+
+.strip-clear {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #93c5fd;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+}
+
+.strip-clear:hover {
+    color: #1d4ed8;
+}
+
+/* ============================================================
+   SALES ORDER / RESTOCK ORDER — shared cart styles
+   ============================================================ */
+.order-header-grid  { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.restock-header-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+@media (max-width: 600px) {
+    .order-header-grid  { grid-template-columns: 1fr 1fr; }
+    .restock-header-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.optional {
+    font-size: 0.75rem;
+    color: var(--slate);
+    font-weight: 400;
+}
+
+.section-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 12px 0 16px;
+}
+
+.add-item-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.qty-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.qty-wrap label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--slate);
+}
+
+.qty-wrap input {
+    width: 72px;
+}
+
+.btn-add-item {
+    padding: 9px 18px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    height: 38px;
+}
+
+.btn-add-item:hover {
+    opacity: 0.88;
+}
+
+.cart-wrap {
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    min-width: unset;
+}
+
+.cart-table thead th {
+    background: var(--surface);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+    border-bottom: 1px solid var(--border);
+}
+
+.cart-table tbody tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.cart-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.cart-table td {
+    padding: 9px 12px;
+}
+
+.cart-qty-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 6px;
+    font-size: 0.875rem;
+}
+
+.btn-remove-cart {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.btn-remove-cart:hover {
+    background: #fee2e2;
+}
+
+.cart-summary {
+    padding: 10px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    padding: 3px 0;
+    color: var(--slate);
+}
+
+.summary-total {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-main);
+    border-top: 1px solid var(--border);
+    margin-top: 5px;
+    padding-top: 7px;
+}
+
+.cart-empty-msg {
+    text-align: center;
+    color: var(--slate);
+    font-size: 0.875rem;
+    padding: 18px 0 8px;
+}
+
+/* ============================================================
+   P&L STATEMENT
+   ============================================================ */
+#plstatement-sec {
+    color: var(--text-main);
+}
+
+#plstatement-sec .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#plstatement-sec .report-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 720px;
+}
+
+#plstatement-sec .report-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+}
+
+#plstatement-sec .report-line:last-child {
+    border-bottom: none;
+}
+
+#plstatement-sec .report-line strong {
+    font-size: 1.1rem;
+}
+
+#plstatement-sec .positive {
+    color: var(--success);
+}
+
+#plstatement-sec .negative {
+    color: var(--danger);
+}
+
+/* ============================================================
+   TRIAL BALANCE
+   ============================================================ */
+#trialbalance-sec {
+    color: var(--text-main);
+}
+
+#trialbalance-sec .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#trialbalance-sec .card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+#trialbalance-sec table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+#trialbalance-sec th {
+    background: var(--bg-light);
+    padding: 12px 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+#trialbalance-sec td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+#trialbalance-sec .total-row {
+    font-weight: 700;
+    background: #f1f5f9;
+}
+
+#trialbalance-sec .status {
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+#trialbalance-sec .balanced {
+    color: var(--success);
+}
+
+#trialbalance-sec .unbalanced {
+    color: var(--danger);
+}
+
+#trialbalance-sec .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+}
+
+.toggle-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.toggle-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.toggle-btn:active {
+    transform: scale(0.95);
+}
+
+td .toggle-btn {
+    margin-left: 8px;
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOOKAHEAD PREDICTIVE ANALYTIC SYSTEMS | Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --danger: #ef4444;
+            --success: #059669;
+            --bg: #f1f5f9;
+            --text-main: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .btn:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+
+        .error {
+            color: var(--danger);
+            margin-top: 15px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .success {
+            color: var(--success);
+            margin-top: 15px;
+            display: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h1>LOOKAHEAD SYSTEM</h1>
+    <p>Login with your Employee ID</p>
+
+    <form method = "POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Employee ID</label>
+            <input name="username" type="text" id="empid" required>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input name="password" type="password" id="password" required>
+        </div>
+
+        <button class="btn" id="loginBtn">Login</button>
+
+        <div id="errorMsg" class="error"></div>
+        <div id="successMsg" class="success"></div>
+    </form>
+</div>
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+</body>
+</html>

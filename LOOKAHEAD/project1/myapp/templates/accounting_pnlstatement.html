@@ -1,0 +1,126 @@
+{% extends "header.html" %} 
+{% block content %}
+
+<style>
+/* Scoped فقط to P&L */
+#plstatement-sec {
+    --bg-light: #f8fafc;
+    --text-main: #1e293b;
+    --border: #e2e8f0;
+    --success: #16a34a;
+    --danger: #dc2626;
+
+    color: var(--text-main);
+}
+
+#plstatement-sec .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#plstatement-sec .report-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 720px;
+}
+
+#plstatement-sec .report-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+}
+
+#plstatement-sec .report-line:last-child {
+    border-bottom: none;
+}
+
+#plstatement-sec .report-line strong {
+    font-size: 1.1rem;
+}
+
+#plstatement-sec .positive {
+    color: var(--success);
+}
+
+#plstatement-sec .negative {
+    color: var(--danger);
+}
+</style>
+
+<section id="plstatement-sec" class="section active">
+    <div class="header-flex">
+        <h1>Profit &amp; Loss Statement</h1>
+    </div>
+
+    <div class="report-card">
+        <div class="report-line">
+            <span>Total Revenue</span>
+            <strong id="plRevenue">₱0.00</strong>
+        </div>
+        <div class="report-line">
+            <span>Total Expenses</span>
+            <strong id="plExpenses">₱0.00</strong>
+        </div>
+        <div class="report-line">
+            <span>Net Income</span>
+            <strong id="plNetIncome">₱0.00</strong>
+        </div>
+    </div>
+</section>
+
+<script>
+    const salesSum = {{ totalsales|default:0 }};
+    const purchaseSum = {{ totalpurchases|default:0 }};
+    const expenseSum = {{ totalexpenses|default:0 }};
+    const inventory = {{ inventory|default:0 }};
+    const restock = {{ restock|default:0}}
+
+    // COGS
+    const COGS = purchaseSum - inventory;
+
+    // Transactions for display
+    const transactions = [
+        { type: "revenue", amount: salesSum },
+        { type: "expense", amount: COGS + expenseSum}, 
+    ];
+
+    function renderPL() {
+        let revenue = 0;
+        let expenses = 0;
+
+        transactions.forEach(t => {
+            if (t.type === "revenue") {
+                revenue += t.amount;
+            } else if (t.type === "expense") {
+                expenses += t.amount;
+            }
+        });
+
+        const netIncome = revenue - expenses;
+
+        document.getElementById("plRevenue").innerText = "₱" + revenue.toLocaleString();
+        document.getElementById("plExpenses").innerText = "₱" + expenses.toLocaleString();
+
+        const netEl = document.getElementById("plNetIncome");
+        netEl.innerText = "₱" + netIncome.toLocaleString();
+
+        if (netIncome >= 0) {
+            netEl.classList.add("positive");
+            netEl.classList.remove("negative");
+        } else {
+            netEl.classList.add("negative");
+            netEl.classList.remove("positive");
+        }
+    }
+
+    renderPL();
+</script>
+
+{% endblock %}

@@ -1,0 +1,504 @@
+{% extends "header.html" %} 
+{% load static %}
+
+{% block content %}
+
+<!-- RESTOCK -->
+<div id="restock-sec" class="section active">
+    <div class="header-flex">
+        <h1>Restock Items</h1>
+        <button class="btn-add" onclick="openModal('restockModal')">+ New Restock</button>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Restock ID</th>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Unit Cost</th>
+                    <th>Total Cost</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="restockTable">
+                {% for r in restockorders %}
+                <tr>
+                    <td>{{ r.restock_id }}</td>
+                    <td>
+                        {% for p in products %}
+                            {% if p.product_id == r.product_id %}
+                                {{ p.product_name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ r.restock_quantity }}</td>
+                    <td>{{ r.unit_cost }}</td>
+                    <td>{{ r.total_cost }}</td>
+                    <td>{{ r.restock_date }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align:center; color: var(--slate); padding: 30px;">
+                        No restock orders yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal_overlay" id="restockModal">
+        <div class="modal modal-wide">
+            <h2>New Restock Order</h2>
+
+            <div class="grid-form restock-header-grid">
+
+                <div class="form-group">
+                    <label>Handled By</label>
+                    <select id="r_emp" required>
+                        {% for emp in empinfo %}
+                            <option value="{{ emp.empid }}">{{ emp.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="r_date">
+                </div>
+
+            </div>
+
+            <hr class="section-divider">
+
+            <div class="add-item-row">
+                <div class="product-input-wrap" style="flex:1;">
+                    <input
+                        type="text"
+                        id="r_product_display"
+                        placeholder="Click to select a product…"
+                        readonly
+                        onclick="openProductPicker()"
+                    >
+                    <span class="picker-icon">⊞</span>
+                </div>
+                <input type="hidden" id="r_pid">
+
+                <div class="qty-wrap">
+                    <label>Qty</label>
+                    <input type="number" id="r_qty" min="1" value="1" step="1">
+                </div>
+
+                <div class="qty-wrap">
+                    <label>Unit Cost (₱)</label>
+                    <input type="number" id="r_unit_cost" min="0" step="0.01" placeholder="0.00" style="width:110px;">
+                </div>
+
+                <button type="button" class="btn-add-item" onclick="addItemToCart()">
+                    + Add
+                </button>
+            </div>
+
+            <div class="selected-strip" id="selectedStrip">
+                <span id="stripText"></span>
+                <button type="button" class="strip-clear" onclick="clearProduct()">✕</button>
+            </div>
+
+            <div class="cart-wrap" id="cartWrap" style="display:none;">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Cost</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartBody"></tbody>
+                </table>
+
+                <div class="cart-summary">
+                    <div class="summary-row summary-total">
+                        <span>Total Restock Cost</span>
+                        <span id="sumTotal">₱0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cart-empty-msg" id="cartEmptyMsg">
+                No items added yet. Use the picker above to add products.
+            </div>
+
+            <div class="modal_footer">
+                <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
+                <button type="button" class="btn-add" id="submitRestockBtn"
+                        onclick="submitRestock()">
+                    Submit Restock
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="product-picker-overlay" id="productPickerOverlay">
+    <div class="product-picker">
+        <div class="picker-header">
+            <h3>Select a Product</h3>
+            <input
+                class="picker-search"
+                type="text"
+                id="pickerSearch"
+                placeholder="Search by name or ID…"
+                oninput="filterProducts(this.value)"
+            >
+            <button class="picker-close" onclick="closeProductPicker()">✕</button>
+        </div>
+        <div class="picker-body">
+            <table class="picker-table">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Current Stock</th>
+                    </tr>
+                </thead>
+                <tbody id="pickerTableBody"></tbody>
+            </table>
+            <div class="picker-empty" id="pickerEmpty" style="display:none;">No products found.</div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-wide { max-width: 760px; width: 95vw; }
+.restock-header-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media (max-width: 600px) { .restock-header-grid { grid-template-columns: 1fr 1fr; } }
+.optional { font-size: .75rem; color: var(--slate); font-weight: 400; }
+.section-divider {
+    border: none;
+    border-top: 1px dashed var(--border, #e2e8f0);
+    margin: 12px 0 16px;
+}
+.add-item-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.qty-wrap { display: flex; flex-direction: column; gap: 4px; }
+.qty-wrap label { font-size: .8rem; font-weight: 600; color: var(--slate); }
+.qty-wrap input { width: 72px; }
+.btn-add-item {
+    padding: 9px 18px;
+    background: var(--primary, #4f46e5);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    height: 38px;
+}
+.btn-add-item:hover { opacity: .88; }
+.cart-wrap { margin-top: 12px; border: 1px solid var(--border,#e2e8f0); border-radius: 8px; overflow: hidden; }
+.cart-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.cart-table thead th {
+    background: var(--surface, #f8fafc);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--slate);
+    border-bottom: 1px solid var(--border,#e2e8f0);
+}
+.cart-table tbody tr { border-bottom: 1px solid var(--border,#e2e8f0); }
+.cart-table tbody tr:last-child { border-bottom: none; }
+.cart-table td { padding: 9px 12px; }
+.cart-qty-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid var(--border,#e2e8f0);
+    border-radius: 5px;
+    padding: 3px 6px;
+    font-size: .875rem;
+}
+.btn-remove-cart {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.btn-remove-cart:hover { background: #fee2e2; }
+.cart-summary {
+    padding: 10px 16px;
+    background: var(--surface, #f8fafc);
+    border-top: 1px solid var(--border,#e2e8f0);
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: .875rem;
+    padding: 3px 0;
+    color: var(--slate);
+}
+.summary-total {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text, #1e293b);
+    border-top: 1px solid var(--border,#e2e8f0);
+    margin-top: 5px;
+    padding-top: 7px;
+}
+.cart-empty-msg {
+    text-align: center;
+    color: var(--slate);
+    font-size: .875rem;
+    padding: 18px 0 8px;
+}
+</style>
+
+
+<script>
+const ALL_PRODUCTS = JSON.parse('{{ products_json|escapejs|default:"[]" }}');
+let cart = [];
+
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('r_date').value = today;
+});
+
+function stockBadge(qty) {
+    if (qty === 0) return `<span class="badge-stock badge-out">Out of stock</span>`;
+    if (qty <= 5)  return `<span class="badge-stock badge-low">${qty} left</span>`;
+    return             `<span class="badge-stock badge-in">${qty} in stock</span>`;
+}
+
+function renderPickerRows(list) {
+    const tbody = document.getElementById('pickerTableBody');
+    const empty = document.getElementById('pickerEmpty');
+    if (list.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = list.map(p => `
+        <tr onclick="selectProduct('${p.product_id}', '${p.product_name.replace(/'/g,"\\'")}', ${p.quantity}, ${p.purchase_price})"
+            style="cursor:pointer;">
+            <td>${p.product_id}</td>
+            <td>${p.product_name}</td>
+            <td>${stockBadge(p.quantity)}</td>
+        </tr>
+    `).join('');
+}
+
+function filterProducts(q) {
+    const query = q.toLowerCase();
+    renderPickerRows(ALL_PRODUCTS.filter(p =>
+        p.product_name.toLowerCase().includes(query) ||
+        String(p.product_id).toLowerCase().includes(query)
+    ));
+}
+
+function openProductPicker() {
+    document.getElementById('pickerSearch').value = '';
+    renderPickerRows(ALL_PRODUCTS);
+    document.getElementById('productPickerOverlay').classList.add('active');
+    setTimeout(() => document.getElementById('pickerSearch').focus(), 80);
+}
+
+function closeProductPicker() {
+    document.getElementById('productPickerOverlay').classList.remove('active');
+}
+
+function selectProduct(id, name, stock, price) {
+    document.getElementById('r_pid').value              = id;
+    document.getElementById('r_product_display').value = `${id} — ${name}`;
+    document.getElementById('r_unit_cost').value        = parseFloat(price).toFixed(2);
+    document.getElementById('stripText').innerHTML =
+        `<strong>${id}</strong> &nbsp;·&nbsp; ${name} &nbsp;·&nbsp; Current stock: ${stock} &nbsp;·&nbsp; ₱${parseFloat(price).toFixed(2)}`;
+    document.getElementById('selectedStrip').classList.add('show');
+    closeProductPicker();
+    document.getElementById('r_qty').focus();
+}
+
+function clearProduct() {
+    document.getElementById('r_pid').value              = '';
+    document.getElementById('r_product_display').value = '';
+    document.getElementById('r_qty').value              = '1';
+    document.getElementById('r_unit_cost').value        = '';
+    document.getElementById('selectedStrip').classList.remove('show');
+}
+
+function addItemToCart() {
+    const pid      = document.getElementById('r_pid').value.trim();
+    const qty      = parseInt(document.getElementById('r_qty').value, 10);
+    const unitCost = parseFloat(document.getElementById('r_unit_cost').value);
+
+    if (!pid)                            { alert('Please select a product first.'); return; }
+    if (!qty || qty < 1)                 { alert('Quantity must be at least 1.'); return; }
+    if (isNaN(unitCost) || unitCost < 0) { alert('Please enter a valid unit cost.'); return; }
+
+    const product  = ALL_PRODUCTS.find(p => String(p.product_id) === String(pid));
+    const existing = cart.find(c => String(c.product_id) === String(pid));
+
+    if (existing) {
+        existing.quantity += qty;
+    } else {
+        cart.push({
+            product_id:   pid,
+            product_name: product ? product.product_name : pid,
+            unit_cost:    unitCost,
+            quantity:     qty,
+        });
+    }
+
+    clearProduct();
+    renderCart();
+}
+
+function removeCartItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+function updateCartQty(index, value) {
+    const qty = parseInt(value, 10);
+    if (qty < 1 || isNaN(qty)) return;
+    cart[index].quantity = qty;
+    recalcSummary();
+}
+
+function renderCart() {
+    const tbody     = document.getElementById('cartBody');
+    const wrap      = document.getElementById('cartWrap');
+    const emptyMsg  = document.getElementById('cartEmptyMsg');
+    const submitBtn = document.getElementById('submitRestockBtn');
+
+    if (cart.length === 0) {
+        wrap.style.display     = 'none';
+        emptyMsg.style.display = 'block';
+        submitBtn.disabled     = true;
+        return;
+    }
+
+    wrap.style.display     = '';
+    emptyMsg.style.display = 'none';
+    submitBtn.disabled     = false;
+
+    tbody.innerHTML = cart.map((item, i) => `
+        <tr>
+            <td>${item.product_name}</td>
+            <td>₱${item.unit_cost.toFixed(2)}</td>
+            <td>
+                <input class="cart-qty-input" type="number" min="1" value="${item.quantity}"
+                onchange="updateCartQty(${i}, this.value)">
+            </td>
+            <td>₱${(item.unit_cost * item.quantity).toFixed(2)}</td>
+            <td>
+                <button class="btn-remove-cart" onclick="removeCartItem(${i})" title="Remove">✕</button>
+            </td>
+        </tr>
+    `).join('');
+
+    recalcSummary();
+}
+
+function recalcSummary() {
+    const total = cart.reduce((s, i) => s + i.unit_cost * i.quantity, 0);
+    document.getElementById('sumTotal').textContent = `₱${total.toFixed(2)}`;
+}
+
+async function submitRestock() {
+    if (cart.length === 0) { alert('Cart is empty.'); return; }
+
+    const payload = {
+        employee_id: document.getElementById('r_emp').value,
+        date:        document.getElementById('r_date').value || null,
+        items: cart.map(c => ({
+            product_id: c.product_id,
+            quantity:   c.quantity,
+            unit_cost:  c.unit_cost,
+        })),
+    };
+
+    const btn = document.getElementById('submitRestockBtn');
+    btn.disabled    = true;
+    btn.textContent = 'Saving…';
+
+    try {
+        const res = await fetch('/restock/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken':  getCookie('csrftoken'),
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            alert(`Restock saved! ID: ${data.restock_id}`);
+            closeModal('restockModal');
+            resetModal();
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+            btn.disabled    = false;
+            btn.textContent = 'Submit Restock';
+        }
+    } catch (err) {
+        alert('Network error: ' + err.message);
+        btn.disabled    = false;
+        btn.textContent = 'Submit Restock';
+    }
+}
+
+function resetModal() {
+    cart = [];
+    renderCart();
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('r_date').value = today;
+    clearProduct();
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('active'); }
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    if (id === 'restockModal') resetModal();
+}
+
+document.getElementById('productPickerOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeProductPicker();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeProductPicker();
+});
+
+function getCookie(name) {
+    let v = null;
+    document.cookie.split(';').forEach(c => {
+        c = c.trim();
+        if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
+    });
+    return v;
+}
+</script>
+
+{% endblock %}
